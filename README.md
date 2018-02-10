@@ -53,13 +53,11 @@ python examples/example_pipeline.py
 
 ## Contributing
 
-There is a [guide](docs/development_guide.md) for first time
-contributors to this project. This project is a fork from
-the
-original
+There is a [guide](docs/development_guide.md) for first time contributors to
+this project. This project is a fork (with history rewritten to reduce size)
+from the original
 [state-adjacency-graphs](https://github.com/gerrymandr/state-adjacency-graphs) and
-would not have been possible without contributions from
-the
+would not have been possible without contributions from the
 [Austin Gerrymandering Hackathon](https://www.ma.utexas.edu/users/blumberg/gerrymandering.html).
 A full contributors list can be found
 at [contributors.txt](docs/contributors.txt).
