@@ -24,7 +24,7 @@ def TwoStepGraph(shp_path, id_column):
     """ Take in a path to a shapefile and create a graph.
         Analysis of adjacency is done with the two-step
         algorithm defined in
-        https://github.com/gerrymandr/state-adjacency-graphs/blob/master/scipy_conference_scaling_adjacency_algos.pdf
+        http://conference.scipy.org/proceedings/scipy2014/laura.html
 
         Input:
             shp_path (string): A path /path/to/shapefile.shp as a string.
