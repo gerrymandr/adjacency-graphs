@@ -1,3 +1,5 @@
+## This is a test edit
+
 # The Adjacency Graphs Project
 [![CircleCI](https://circleci.com/gh/gerrymandr/adjacency-graphs.svg?style=svg)](https://circleci.com/gh/gerrymandr/adjacency-graphs)
 ## About
