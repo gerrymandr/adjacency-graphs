@@ -1,4 +1,5 @@
 fiona
+knowledge
 numpy
 pandas
 pysal
