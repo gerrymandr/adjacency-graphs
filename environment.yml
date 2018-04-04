@@ -7,7 +7,6 @@ dependencies:
   - matplotlib
   - pandas
   - pysal
-  - palettable
   - fiona
   - notebook
   - nomkl
