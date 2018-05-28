@@ -18,6 +18,7 @@ requirements = [
     'shapely',
     'matplotlib',
     'palettable',
+    'bokeh',
 ]
 
 setup(
