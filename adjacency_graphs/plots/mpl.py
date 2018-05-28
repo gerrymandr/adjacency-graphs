@@ -2,9 +2,15 @@ import matplotlib.pyplot as plt
 import pysal as ps
 from matplotlib.collections import LineCollection
 from pysal.contrib.viz import mapping as maps
+import geopandas as gpd
+import numpy as np
+
+#from bokeh.sampledata import us_counties, unemployment
+from bokeh.models import HoverTool
+from bokeh.plotting import figure, show, output_file, ColumnDataSource
 
 
-def visualize_adjacency_graph(mggg_graph, out_dir=None):
+def visualize_adjacency_graph(mggg_graph, bokeh_graph=False, out_dir=None):
     ''' Visualize an adjacency graph
         Input: 
             mggg_graph (Graph): A graph object from adjacency_graphs.algorithms
@@ -34,17 +40,89 @@ def visualize_adjacency_graph(mggg_graph, out_dir=None):
 
     polygon_centroids = {x: y.centroid for x, y in enumerate(shp)}
 
-    # connect centroids of the polygons using LineCollection
-    edge_list = [(polygon_centroids[gti[poly1]],
-                  polygon_centroids[gti[poly2]]) for poly1, neighbors in graph.items()
-                 for poly2 in neighbors]
+    if bokeh_graph == False:
+        edge_list = [(polygon_centroids[gti[poly1]],
+                      polygon_centroids[gti[poly2]]) for poly1, neighbors in graph.items()
+                     for poly2 in neighbors]
 
-    edge_list = LineCollection(edge_list)
-    edge_list.set_linewidth(0.20)
-    ax = maps.setup_ax([base, edge_list], [shp.bbox, shp.bbox])
-    fig.add_axes(ax)
+        edge_list = LineCollection(edge_list)
+        edge_list.set_linewidth(0.20)
+        ax = maps.setup_ax([base, edge_list], [shp.bbox, shp.bbox])
+        fig.add_axes(ax)
 
-    # save your output
-    if(out_dir is not None):
-        savefig(out_dir)
-    return fig
+        # save your output
+        if(out_dir is not None):
+            savefig(out_dir)
+        return fig
+    else:
+        edge_list_bokeh_x = [[polygon_centroids[gti[poly1]][0],
+                            polygon_centroids[gti[poly2]][0]] 
+                           for poly1, neighbors in graph.items()
+                           for poly2 in neighbors]
+        edge_list_bokeh_y = [[polygon_centroids[gti[poly1]][1],
+                            polygon_centroids[gti[poly2]][1]] 
+                           for poly1, neighbors in graph.items()
+                           for poly2 in neighbors]
+        tx = gpd.read_file(mggg_graph.shp_path)
+        lons, lats = gpd_bokeh(tx)
+        source = ColumnDataSource(data=dict(
+                                    x=lons,
+                                    y=lats,
+                                    #color=colors,
+                                    name=tx.NAME
+                                    #rate=HR90
+                                ))
+
+        TOOLS = "pan, wheel_zoom, box_zoom, reset, hover, save"
+        p = figure(title="Adjecency Graph", tools=TOOLS,
+                  plot_width=900, plot_height=900)
+
+        p.patches('x', 'y', source=source,
+                 fill_alpha=0.7, color='white',
+                 line_color='black', line_width=0.5)
+
+        hover = p.select_one(HoverTool)
+        hover.point_policy = 'follow_mouse'
+        hover.tooltips = [
+            ("Name", "@name"),
+            ("(Long, Lat)", "($x, $y)"),
+        ]
+
+
+
+        p.multi_line(edge_list_bokeh_x, edge_list_bokeh_y , line_width=1)
+
+        output_file("adjancency.html", title="Adjacency Graph")
+        show(p)
+
+
+def gpd_bokeh(df):
+    """Convert geometries from geopandas to bokeh format"""
+    nan = float('nan')
+    lons = []
+    lats = []
+    for i,shape in enumerate(df.geometry.values):
+        if shape.geom_type == 'MultiPolygon':
+            gx = []
+            gy = []
+            ng = len(shape.geoms) - 1
+            for j,member in enumerate(shape.geoms):
+                xy = np.array(list(member.exterior.coords))
+                xs = xy[:,0].tolist()
+                ys = xy[:,1].tolist()
+                gx.extend(xs)
+                gy.extend(ys)
+                if j < ng:
+                    gx.append(nan)
+                    gy.append(nan)
+            lons.append(gx)
+            lats.append(gy)
+                
+        else:     
+            xy = np.array(list(shape.exterior.coords))
+            xs = xy[:,0].tolist()
+            ys = xy[:,1].tolist()
+            lons.append(xs)
+            lats.append(ys) 
+
+    return lons,lats
