@@ -19,7 +19,6 @@ requirements = [
     'matplotlib',
     'palettable',
     'bokeh',
-    'geopandas',
 ]
 
 setup(

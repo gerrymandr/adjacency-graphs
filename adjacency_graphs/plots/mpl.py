@@ -2,10 +2,8 @@ import matplotlib.pyplot as plt
 import pysal as ps
 from matplotlib.collections import LineCollection
 from pysal.contrib.viz import mapping as maps
-import geopandas as gpd
 import numpy as np
 
-#from bokeh.sampledata import us_counties, unemployment
 from bokeh.models import HoverTool
 from bokeh.plotting import figure, show, output_file, ColumnDataSource
 
@@ -63,13 +61,13 @@ def visualize_adjacency_graph(mggg_graph, bokeh_graph=False, out_dir=None):
                             polygon_centroids[gti[poly2]][1]] 
                            for poly1, neighbors in graph.items()
                            for poly2 in neighbors]
-        tx = gpd.read_file(mggg_graph.shp_path)
-        lons, lats = gpd_bokeh(tx)
+        
+        lons, lats = gpd_bokeh(mggg_graph.shape_df)
         source = ColumnDataSource(data=dict(
                                     x=lons,
                                     y=lats,
                                     #color=colors,
-                                    name=tx.NAME
+                                    name=mggg_graph.shape_df.NAME
                                     #rate=HR90
                                 ))
 
@@ -101,28 +99,13 @@ def gpd_bokeh(df):
     nan = float('nan')
     lons = []
     lats = []
-    for i,shape in enumerate(df.geometry.values):
-        if shape.geom_type == 'MultiPolygon':
-            gx = []
-            gy = []
-            ng = len(shape.geoms) - 1
-            for j,member in enumerate(shape.geoms):
-                xy = np.array(list(member.exterior.coords))
-                xs = xy[:,0].tolist()
-                ys = xy[:,1].tolist()
-                gx.extend(xs)
-                gy.extend(ys)
-                if j < ng:
-                    gx.append(nan)
-                    gy.append(nan)
-            lons.append(gx)
-            lats.append(gy)
-                
-        else:     
-            xy = np.array(list(shape.exterior.coords))
-            xs = xy[:,0].tolist()
-            ys = xy[:,1].tolist()
-            lons.append(xs)
-            lats.append(ys) 
+    for i,shape in enumerate(df.geometry):
+        #print('yes')  
+
+        xy = np.array(list(shape.parts[0]))
+        xs = xy[:,0].tolist()
+        ys = xy[:,1].tolist()
+        lons.append(xs)
+        lats.append(ys) 
 
     return lons,lats
