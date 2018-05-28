@@ -66,9 +66,7 @@ def visualize_adjacency_graph(mggg_graph, bokeh_graph=False, out_dir=None):
         source = ColumnDataSource(data=dict(
                                     x=lons,
                                     y=lats,
-                                    #color=colors,
                                     name=mggg_graph.shape_df.NAME
-                                    #rate=HR90
                                 ))
 
         TOOLS = "pan, wheel_zoom, box_zoom, reset, hover, save"
@@ -90,7 +88,7 @@ def visualize_adjacency_graph(mggg_graph, bokeh_graph=False, out_dir=None):
 
         p.multi_line(edge_list_bokeh_x, edge_list_bokeh_y , line_width=1)
 
-        output_file("adjancency.html", title="Adjacency Graph")
+        output_file("adjacency.html", title="Adjacency Graph")
         show(p)
 
 
