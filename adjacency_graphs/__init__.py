@@ -1,1 +1,0 @@
-from adjacency_graphs.mggg_graph import MgggGraph
